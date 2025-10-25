@@ -116,6 +116,8 @@ export const AppDataSource =
         host: "localhost",
         port: 5432,
         database: "life_schedule_test",
+        username: "postgres",
+        password: "postgres",
         entities: [User, Event, Contact],
         synchronize: true, // for development: auto create database schema, no migrations
         logging: false,
