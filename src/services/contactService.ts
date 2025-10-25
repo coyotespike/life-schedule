@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { Contact } from "../entities/Contact";
-import { AppDataSource } from "../index";
+import { AppDataSource } from "../server";
 
 export class ContactService {
   private contactRepository: Repository<Contact>;

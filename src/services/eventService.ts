@@ -1,6 +1,6 @@
 import { Repository } from "typeorm";
 import { Event } from "../entities/Event";
-import { AppDataSource } from "../index";
+import { AppDataSource } from "../server";
 
 export class EventService {
   private eventRepository: Repository<Event>;
@@ -16,14 +16,14 @@ export class EventService {
 
   async findAll(): Promise<Event[]> {
     return await this.eventRepository.find({
-      relations: ["contact"]
+      relations: ["contact"],
     });
   }
 
   async findById(id: number): Promise<Event | null> {
     return await this.eventRepository.findOne({
       where: { id },
-      relations: ["contact"]
+      relations: ["contact"],
     });
   }
 
@@ -40,14 +40,14 @@ export class EventService {
   async findByName(name: string): Promise<Event[]> {
     return await this.eventRepository.find({
       where: { name },
-      relations: ["contact"]
+      relations: ["contact"],
     });
   }
 
   async findByAddress(address: string): Promise<Event[]> {
     return await this.eventRepository.find({
       where: { address },
-      relations: ["contact"]
+      relations: ["contact"],
     });
   }
 
@@ -57,7 +57,7 @@ export class EventService {
       .leftJoinAndSelect("event.contact", "contact")
       .where("event.time >= :startTime AND event.time <= :endTime", {
         startTime,
-        endTime
+        endTime,
       })
       .getMany();
   }
@@ -65,7 +65,7 @@ export class EventService {
   async findByContact(contactId: number): Promise<Event[]> {
     return await this.eventRepository.find({
       where: { contactId },
-      relations: ["contact"]
+      relations: ["contact"],
     });
   }
 
