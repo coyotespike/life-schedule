@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { DataSource } from "typeorm";
 import express from "express";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { User } from "./entities/User";
 import { Event } from "./entities/Event";
 import { Contact } from "./entities/Contact";
@@ -17,6 +18,23 @@ export function createApp(dataSource: DataSource) {
   const contactService = new ContactService(dataSource);
   const eventService = new EventService(dataSource);
 
+  const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
+  const verifyAuth = (req: any) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return { success: false, error: "No token provided" };
+    }
+
+    const token = authHeader.substring(7);
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      return { success: true, user: decoded };
+    } catch (error) {
+      return { success: false, error: "Invalid token" };
+    }
+  };
+
   app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     try {
@@ -25,7 +43,12 @@ export function createApp(dataSource: DataSource) {
         res.status(401).json({ error: "Username not found" });
       } else if (await bcrypt.compare(password, user.password)) {
         const { password, ...userWithoutPassword } = user;
-        res.json({ message: "Login successful", user: userWithoutPassword });
+        const token = jwt.sign(
+          { userId: user.id, username: user.username },
+          JWT_SECRET,
+          { expiresIn: "24h" }
+        );
+        res.json({ message: "Login successful", token, user: userWithoutPassword });
       } else {
         res.status(401).json({ error: "Invalid password" });
       }
@@ -79,6 +102,11 @@ export function createApp(dataSource: DataSource) {
   });
 
   app.get("/contacts", async (req, res) => {
+    const auth = verifyAuth(req);
+    if (!auth.success) {
+      return res.status(401).json({ error: auth.error });
+    }
+
     try {
       const contacts = await contactService.findAll();
       res.json(contacts);

@@ -28,6 +28,8 @@
 - [ ] Add remaining API routes/endpoints for db CRUD
 - [ ] getAllContactsWithUpcomingBirthdays()
 - [ ] getAllContactsAttendingUpcomingEvents()
+- [ ] Audit services to see if by user 
+- [ ] Update services so they accept user param
 
 ### Contact Features
 - [ ] Send event invitations
