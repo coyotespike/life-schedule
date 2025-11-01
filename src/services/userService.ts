@@ -1,12 +1,11 @@
-import { Repository } from "typeorm";
+import { Repository, DataSource } from "typeorm";
 import { User } from "../entities/User";
-import { AppDataSource } from "../server";
 
 export class UserService {
   private userRepository: Repository<User>;
 
-  constructor() {
-    this.userRepository = AppDataSource.getRepository(User);
+  constructor(dataSource: DataSource) {
+    this.userRepository = dataSource.getRepository(User);
   }
 
   async create(userData: Partial<User>): Promise<User> {

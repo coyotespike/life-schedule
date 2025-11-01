@@ -5,7 +5,7 @@ async function main() {
     await AppDataSource.initialize();
     console.log("Data Source has been initialized!");
 
-    const app = createApp();
+    const app = createApp(AppDataSource);
 
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {

@@ -1,12 +1,11 @@
-import { Repository } from "typeorm";
+import { Repository, DataSource } from "typeorm";
 import { Contact } from "../entities/Contact";
-import { AppDataSource } from "../server";
 
 export class ContactService {
   private contactRepository: Repository<Contact>;
 
-  constructor() {
-    this.contactRepository = AppDataSource.getRepository(Contact);
+  constructor(dataSource: DataSource) {
+    this.contactRepository = dataSource.getRepository(Contact);
   }
 
   async create(contactData: Partial<Contact>): Promise<Contact> {

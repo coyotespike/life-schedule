@@ -1,12 +1,11 @@
-import { Repository } from "typeorm";
+import { Repository, DataSource } from "typeorm";
 import { Event } from "../entities/Event";
-import { AppDataSource } from "../server";
 
 export class EventService {
   private eventRepository: Repository<Event>;
 
-  constructor() {
-    this.eventRepository = AppDataSource.getRepository(Event);
+  constructor(dataSource: DataSource) {
+    this.eventRepository = dataSource.getRepository(Event);
   }
 
   async create(eventData: Partial<Event>): Promise<Event> {

@@ -9,13 +9,13 @@ import { UserService } from "./services/userService";
 import { ContactService } from "./services/contactService";
 import { EventService } from "./services/eventService";
 
-export function createApp() {
+export function createApp(dataSource: DataSource) {
   const app = express();
   app.use(express.json());
 
-  const userService = new UserService();
-  const contactService = new ContactService();
-  const eventService = new EventService();
+  const userService = new UserService(dataSource);
+  const contactService = new ContactService(dataSource);
+  const eventService = new EventService(dataSource);
 
   app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -109,25 +109,19 @@ export function createApp() {
   return app;
 }
 
-export const AppDataSource =
-  process.env.NODE_ENV === "test"
-    ? new DataSource({
-        type: "postgres",
-        host: "localhost",
-        port: 5432,
-        database: "life_schedule_test",
-        username: "postgres",
-        password: "postgres",
-        entities: [User, Event, Contact],
-        synchronize: true, // for development: auto create database schema, no migrations
-        logging: false,
-      })
-    : new DataSource({
-        type: "postgres",
-        host: "localhost",
-        port: 5432,
-        database: "life_schedule",
-        entities: [User, Event, Contact],
-        synchronize: true, // for development: auto create database schema, no migrations
-        logging: false,
-      });
+export const AppDataSource = new DataSource({
+  type: "postgres",
+  host: "localhost",
+  port: 5432,
+  database: "life_schedule",
+  entities: [User, Event, Contact],
+  synchronize: true, // for development: auto create database schema, no migrations
+  logging: false,
+});
+
+// My complaint:
+// we had to figure out server.e2e.test.ts
+// then setup.ts
+// and then see: where do we make the db?
+// it would be better to have the test db made in the test file
+// one solution: remove redunant code

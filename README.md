@@ -16,7 +16,6 @@
   - [ ] Handle on backend (in CRUD or API)
   - [ ] Can also handle on frontend
  
-
 ### API Routes
 - [x] GET /users
 - [x] POST /users (create user)
@@ -55,6 +54,8 @@
 ### Convenience
 - [ ] Add package.json command to start postgres in background if not started
 
+### Tech Debt
+- [x] Refactor test and prod DB creation
 
 ## Tables
 Events

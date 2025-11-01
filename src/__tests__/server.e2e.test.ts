@@ -1,11 +1,12 @@
 import request from "supertest";
 import { createApp } from "../server";
+import { testDataSource } from "./setup";
 
 describe("E2E Tests", () => {
   let app: any;
 
   beforeAll(async () => {
-    app = createApp();
+    app = createApp(testDataSource);
   });
 
   describe("Basic connectivity", () => {

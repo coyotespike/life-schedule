@@ -1,6 +1,8 @@
 import "reflect-metadata";
 import { DataSource } from "typeorm";
-import { AppDataSource } from "../server";
+import { User } from "../entities/User";
+import { Event } from "../entities/Event";
+import { Contact } from "../entities/Contact";
 
 async function createTestDatabase() {
   const adminDataSource = new DataSource({
@@ -25,20 +27,32 @@ async function createTestDatabase() {
   }
 }
 
+// new DataSource will connect but can't create the db
+export const testDataSource = new DataSource({
+  type: "postgres",
+  host: "localhost",
+  port: 5432,
+  database: "life_schedule_test",
+  username: "postgres",
+  password: "postgres",
+  entities: [User, Event, Contact],
+  synchronize: true,
+  logging: false,
+});
+
 beforeAll(async () => {
-  process.env.NODE_ENV = "test";
   await createTestDatabase();
-  await AppDataSource.initialize();
+  await testDataSource.initialize();
 });
 
 afterAll(async () => {
-  await AppDataSource.destroy();
+  await testDataSource.destroy();
 });
 
 beforeEach(async () => {
-  const entities = AppDataSource.entityMetadatas;
+  const entities = testDataSource.entityMetadatas;
   for (const entity of entities) {
-    const repository = AppDataSource.getRepository(entity.name);
+    const repository = testDataSource.getRepository(entity.name);
     await repository.createQueryBuilder().delete().execute();
   }
 });
