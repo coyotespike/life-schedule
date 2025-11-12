@@ -2,6 +2,7 @@ import { createApp, createAppDatabase, AppDataSource } from "./server";
 
 async function main() {
   try {
+    // TODO: check if DB exists before trying to create
     await createAppDatabase();
     console.log("Postgres database has been initialized!");
 

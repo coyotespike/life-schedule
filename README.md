@@ -28,8 +28,9 @@
 - [ ] Add remaining API routes/endpoints for db CRUD
 - [ ] getAllContactsWithUpcomingBirthdays()
 - [ ] getAllContactsAttendingUpcomingEvents()
-- [ ] Audit services to see if by user 
-- [ ] Update services so they accept user param
+- [x] Audit services to see if by user 
+- [x] Update Contact service so they accept user param
+- [x] Only create contacts for logged-in users
 
 ### Contact Features
 - [ ] Send event invitations
