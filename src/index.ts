@@ -1,7 +1,10 @@
-import { createApp, AppDataSource } from "./server";
+import { createApp, createAppDatabase, AppDataSource } from "./server";
 
 async function main() {
   try {
+    await createAppDatabase();
+    console.log("Postgres database has been initialized!");
+
     await AppDataSource.initialize();
     console.log("Data Source has been initialized!");
 

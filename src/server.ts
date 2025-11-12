@@ -157,6 +157,29 @@ export const AppDataSource = new DataSource({
   logging: false,
 });
 
+export async function createAppDatabase() {
+  const adminDataSource = new DataSource({
+    type: "postgres",
+    host: "localhost",
+    port: 5432,
+    database: "postgres",
+    username: "postgres",
+    password: "postgres",
+  });
+
+  try {
+    await adminDataSource.initialize();
+    await adminDataSource.query(`CREATE DATABASE "life_schedule"`);
+    console.log("App database created");
+  } catch (error: any) {
+    if (error.code !== "42P04") {
+      console.error("Error creating app database:", error);
+    }
+  } finally {
+    await adminDataSource.destroy();
+  }
+}
+
 // My complaint:
 // we had to figure out server.e2e.test.ts
 // then setup.ts
