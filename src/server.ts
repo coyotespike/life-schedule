@@ -33,6 +33,54 @@ export function createApp(dataSource: DataSource) {
 
   const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
 
+  // Health check endpoint
+  app.get("/health", async (req, res) => {
+    try {
+      // Check database connection
+      const isConnected = dataSource.isInitialized;
+      let dbStatus = "disconnected";
+      
+      if (isConnected) {
+        // Try a simple query to verify database is responsive
+        await dataSource.query("SELECT 1");
+        dbStatus = "connected";
+      }
+
+      const healthStatus = {
+        status: "healthy",
+        timestamp: new Date().toISOString(),
+        database: {
+          status: dbStatus,
+          type: "postgres",
+        },
+        server: {
+          uptime: process.uptime(),
+        },
+      };
+
+      if (dbStatus === "connected") {
+        res.status(200).json(healthStatus);
+      } else {
+        res.status(503).json({
+          ...healthStatus,
+          status: "unhealthy",
+        });
+      }
+    } catch (error: any) {
+      res.status(503).json({
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+        database: {
+          status: "error",
+          error: error.message,
+        },
+        server: {
+          uptime: process.uptime(),
+        },
+      });
+    }
+  });
+
   const verifyAuth = (req: any): AuthResult => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -191,6 +239,7 @@ export const AppDataSource = new DataSource({
   type: "postgres",
   host: "localhost",
   port: 5432,
+  username: process.env.DB_USER || "rachel",
   database: "life_schedule",
   entities: [User, Event, Contact],
   synchronize: true, // for development: auto create database schema, no migrations
@@ -203,8 +252,7 @@ export async function createAppDatabase() {
     host: "localhost",
     port: 5432,
     database: "postgres",
-    username: "postgres",
-    password: "postgres",
+    username: process.env.DB_USER || "rachel",
   });
 
   try {
