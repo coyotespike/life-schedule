@@ -66,4 +66,62 @@ export class ContactService {
       where: { phoneNumber },
     });
   }
+
+  async findContactsWithUpcomingBirthdays(
+    userId: number,
+    daysAhead: number = 30
+  ): Promise<Contact[]> {
+    const allContacts = await this.findByUserId(userId);
+    const today = new Date();
+    // Set time to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0);
+    
+    const targetDate = new Date(today);
+    targetDate.setDate(today.getDate() + daysAhead);
+    // Set time to end of day to include the full target day
+    targetDate.setHours(23, 59, 59, 999);
+
+    return allContacts
+      .filter((contact) => {
+        if (!contact.birthMonth || !contact.birthDay) {
+          return false;
+        }
+
+        const thisYear = today.getFullYear();
+        let contactBirthday = new Date(
+          thisYear,
+          contact.birthMonth - 1,
+          contact.birthDay
+        );
+        contactBirthday.setHours(0, 0, 0, 0);
+
+        // If birthday already passed this year, check next year
+        if (contactBirthday < today) {
+          contactBirthday = new Date(
+            thisYear + 1,
+            contact.birthMonth - 1,
+            contact.birthDay
+          );
+          contactBirthday.setHours(0, 0, 0, 0);
+        }
+
+        // Check if birthday falls within the range
+        return contactBirthday >= today && contactBirthday <= targetDate;
+      })
+      .sort((a, b) => {
+        // Sort by upcoming birthday date
+        const today = new Date();
+        const thisYear = today.getFullYear();
+        
+        const getBirthdayDate = (contact: Contact) => {
+          let date = new Date(thisYear, contact.birthMonth! - 1, contact.birthDay!);
+          if (date < today) {
+            date = new Date(thisYear + 1, contact.birthMonth! - 1, contact.birthDay!);
+          }
+          return date.getTime();
+        };
+
+        return getBirthdayDate(a) - getBirthdayDate(b);
+      });
+  }
 }

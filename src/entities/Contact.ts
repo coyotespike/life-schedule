@@ -20,4 +20,13 @@ export class Contact {
 
   @Column()
   userId!: number;
+
+  @Column({ type: "int", nullable: true })
+  birthMonth?: number; // 1-12, optional
+
+  @Column({ type: "int", nullable: true })
+  birthDay?: number; // 1-31, optional
+
+  @Column({ type: "int", nullable: true })
+  birthYear?: number; // Optional year
 }
